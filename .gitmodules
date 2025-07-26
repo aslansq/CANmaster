@@ -1,0 +1,3 @@
+[submodule "AutosarE2E"]
+	path = AutosarE2E
+	url = git@github.com:aslansq/AutosarE2E.git
