@@ -2,6 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QButtonGroup>
+#include <QTreeWidgetItem>
+#include <QVector>
+#include <QPointer>
+#include "canstdform.h"
+#include "e2eprotectsend.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,7 +21,15 @@ public:
 	MainWindow(QWidget *parent = nullptr);
 	~MainWindow();
 
+private slots:
+	void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
 private:
 	Ui::MainWindow *ui;
+	QButtonGroup *checkButtonGroupPtr;
+	CanStdForm *canStdFormPtr;
+	QVector<E2EProtectSend *> e2eProtectSendPtrVect;
+
+	void clearUnvisibleWidgets(void);
 };
 #endif // MAINWINDOW_H

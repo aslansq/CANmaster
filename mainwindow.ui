@@ -6,15 +6,155 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>704</width>
+    <height>595</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CANmaster</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QTreeWidget" name="treeWidget">
+        <column>
+         <property name="text">
+          <string>Features</string>
+         </property>
+        </column>
+        <item>
+         <property name="text">
+          <string>Monitor</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>UDS</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>UDS_Client</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>UDS_Tracer</string>
+          </property>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>E2E_Protocol</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>E2E_Protect_Send</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>E2E_Receive_Check</string>
+          </property>
+         </item>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="mainVerticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="statusLabel">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="connectionStatusLabel">
+            <property name="text">
+             <string>Offline</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QCheckBox" name="stdCheckBox">
+            <property name="text">
+             <string>Std</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="fdCheckBox">
+            <property name="text">
+             <string>Fd</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="replayCheckBox">
+            <property name="text">
+             <string>Replay</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="connectPushButton">
+            <property name="text">
+             <string>Connect</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>704</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
