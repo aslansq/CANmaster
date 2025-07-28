@@ -4,6 +4,8 @@
 CanStdForm::CanStdForm(QWidget *parent)
 	: QWidget(parent)
 	, ui(new Ui::CanStdForm)
+	, baud("1 MBit/s")
+	, channel("PCAN_USBBUS1")
 	,availableBaudrates({
 		{"1 MBit/s"  , 1000000},
 		{"800 kBit/s", 800000 },
@@ -33,7 +35,6 @@ CanStdForm::CanStdForm(QWidget *parent)
 	for(const QString &key : availableDevChannels.keys()) {
 		ui->channelComboBox->addItem(key);
 	}
-
 	for(const QString &key : availableBaudrates.keys()) {
 		ui->baudComboBox->addItem(key);
 	}
@@ -43,3 +44,29 @@ CanStdForm::~CanStdForm()
 {
 	delete ui;
 }
+
+uint64_t CanStdForm::getBaud(void) const
+{
+	return availableBaudrates[baud];
+}
+int CanStdForm::getChannel(void) const
+{
+	return availableDevChannels[channel];
+}
+
+QString CanStdForm::getInterface(void)
+{
+	return "PEAK";
+}
+
+void CanStdForm::on_channelComboBox_currentTextChanged(const QString &arg1)
+{
+	channel = arg1;
+}
+
+
+void CanStdForm::on_baudComboBox_currentTextChanged(const QString &arg1)
+{
+	baud = arg1;
+}
+
