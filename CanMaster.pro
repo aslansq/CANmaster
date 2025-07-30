@@ -11,9 +11,12 @@ CONFIG += c++20
 SOURCES += \
     CAN/can.cpp \
     CAN/canstdform.cpp \
-    E2E/e2eprotectsend.cpp \
-    E2E/e2eprotectsendp11.cpp \
-    E2E/e2eprotecttxmsg.cpp \
+    E2E/ProtectSend/e2eprotectsend.cpp \
+    E2E/ProtectSend/e2eprotectsendp11.cpp \
+    E2E/ProtectSend/e2eprotecttxmsg.cpp \
+    E2E/ReceiveCheck/e2ereceivecheck.cpp \
+    E2E/ReceiveCheck/e2ereceivecheckp11.cpp \
+    E2E/ReceiveCheck/e2ereceiverxmsg.cpp \
     main.cpp \
     mainwindow.cpp \
     PEAK/peakbasiccan.cpp \
@@ -24,9 +27,12 @@ SOURCES += \
 HEADERS += \
     CAN/can.h \
     CAN/canstdform.h \
-    E2E/e2eprotectsend.h \
-    E2E/e2eprotectsendp11.h \
-    E2E/e2eprotecttxmsg.h \
+    E2E/ProtectSend/e2eprotectsend.h \
+    E2E/ProtectSend/e2eprotectsendp11.h \
+    E2E/ProtectSend/e2eprotecttxmsg.h \
+    E2E/ReceiveCheck/e2ereceivecheck.h \
+    E2E/ReceiveCheck/e2ereceivecheckp11.h \
+    E2E/ReceiveCheck/e2ereceiverxmsg.h \
     mainwindow.h \
     PEAK/peakbasiccan.h \
     PEAK/peakstdcan.h \
@@ -35,15 +41,19 @@ HEADERS += \
 
 FORMS += \
     CAN/canstdform.ui \
-    E2E/e2eprotectsend.ui \
-    E2E/e2eprotectsendp11.ui \
-    E2E/e2eprotecttxmsg.ui \
+    E2E/ProtectSend/e2eprotectsend.ui \
+    E2E/ProtectSend/e2eprotectsendp11.ui \
+    E2E/ProtectSend/e2eprotecttxmsg.ui \
+    E2E/ReceiveCheck/e2ereceivecheck.ui \
+    E2E/ReceiveCheck/e2ereceivecheckp11.ui \
+    E2E/ReceiveCheck/e2ereceiverxmsg.ui \
     mainwindow.ui
 
 INCLUDEPATH += /usr/local/include
 INCLUDEPATH += AutosarE2E/
 INCLUDEPATH += CAN/
-INCLUDEPATH += E2E/
+INCLUDEPATH += E2E/ProtectSend
+INCLUDEPATH += E2E/ReceiveCheck
 INCLUDEPATH += PEAK/
 LIBS += -L/usr/local/lib -ldbcppp
 LIBS += -lpcanbasic

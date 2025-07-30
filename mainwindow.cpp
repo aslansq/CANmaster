@@ -44,16 +44,15 @@ MainWindow::~MainWindow()
 	for(E2EProtectSend * e2eProtectSendPtr : e2eProtectSendPtrVect) {
 		delete e2eProtectSendPtr;
 	}
+
+	for(E2EReceiveCheck * e2eReceiveCheckPtr : e2eReceiveCheckPtrVect) {
+		delete e2eReceiveCheckPtr;
+	}
 }
 
-
-void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void MainWindow::createE2EProtectSend(void)
 {
-	qDebug() << item->text(column) << " feature triggered";
-
-	if(item->text(column) != "E2E_Protect_Send") {
-		// do nothing
-	} else if(netPtr == nullptr) {
+	if(netPtr == nullptr) {
 		QMessageBox::warning(
 			nullptr,
 			"Warning",
@@ -80,10 +79,56 @@ void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int colu
 	}
 }
 
+void MainWindow::createE2EReceiveCheck(void)
+{
+	if(netPtr == nullptr) {
+		QMessageBox::warning(
+			nullptr,
+			"Warning",
+			"To open E2E_Receive_Check first load DBC"
+		);
+		qDebug() << "To open E2E_Receive_Check first load DBC";
+	} else {
+		auto e2eReceiveCheckPtr = new E2EReceiveCheck(netPtr);
+		connect(
+			e2eReceiveCheckPtr,
+			&E2EReceiveCheck::closed,
+			this,
+			&MainWindow::e2eReceiveCheckClosed
+		);
+		connect(
+			this,
+			&MainWindow::canMsgReceived,
+			e2eReceiveCheckPtr,
+			&E2EReceiveCheck::onCanMsgReceived
+		);
+		e2eReceiveCheckPtr->setVisible(true);
+		qDebug() << "Opened E2E_Receive_Check";
+		e2eReceiveCheckPtrVect.append(e2eReceiveCheckPtr);
+	}
+}
+
+void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+	qDebug() << item->text(column) << " feature triggered";
+
+	if(item->text(column) == "E2E_Protect_Send") {
+		createE2EProtectSend();
+	} else if(item->text(column) == "E2E_Receive_Check") {
+		createE2EReceiveCheck();
+	} else {
+		qDebug() << "Unknown feature";
+	}
+}
+
 bool MainWindow::isAllDbcRelatedWinClosed(void) const
 {
 	bool ret = true;
 	if(e2eProtectSendPtrVect.size() != 0) {
+		ret = false;
+	}
+
+	if(e2eReceiveCheckPtrVect.size() != 0) {
 		ret = false;
 	}
 
@@ -136,6 +181,12 @@ void MainWindow::e2eProtectSendClosed(E2EProtectSend *ptr)
 	delete ptr;
 }
 
+void MainWindow::e2eReceiveCheckClosed(E2EReceiveCheck *ptr)
+{
+	e2eReceiveCheckPtrVect.removeOne(ptr);
+	delete ptr;
+}
+
 void MainWindow::e2eProtectSendCanMsg(CanMsg canMsg)
 {
 	if(canPtr == nullptr) {
@@ -177,6 +228,12 @@ void MainWindow::canStdConnect(void)
 	try {
 		peakStdCanPtr->connect(canStdConfig);
 		canPtr = std::move(peakStdCanPtr);
+		connect(
+			canPtr.get(),
+			&Can::eventOccured,
+			this,
+			&MainWindow::onCanEventOccured
+		);
 		ui->connectionStatusLabel->setText("Online");
 	} catch (const std::runtime_error &e) {
 		std::cout << e.what() << std::endl;
@@ -195,10 +252,16 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
 	} else {
 		if(canPtr == nullptr) {
 			// there is nothing to do
-		} else if(canInt == CanInt::Std) {
+		} else {
 			try {
 				canPtr->disconnect();
 				ui->connectionStatusLabel->setText("Offline");
+				disconnect(
+					canPtr.get(),
+					&Can::eventOccured,
+					this,
+					&MainWindow::onCanEventOccured
+				);
 			} catch (const std::runtime_error &e) {
 				std::cout << e.what() << std::endl;
 				ui->connectPushButton->setChecked(true);
@@ -211,3 +274,20 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
 	}
 }
 
+void MainWindow::onCanEventOccured(CanEvent event)
+{
+	if(event == CanEvent::MessageReceived) {
+		if(canPtr == nullptr) {
+			qDebug() << "CAN interface not connected, cannot receive message";
+			return;
+		}
+
+		CanMsg canMsg;
+		try {
+			canMsg = canPtr->rxQueue.dequeue();
+			emit canMsgReceived(canMsg);
+		} catch (const std::exception &e) {
+			qDebug() << "Error receiving CAN message: " << e.what();
+		}
+	}
+}
