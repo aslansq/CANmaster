@@ -102,6 +102,12 @@ private:
 	 *  crc
 	 */
 	void tryFindCrcAndCounter(void);
+	/**
+	 *  @brief Tries to find message cycle time from message's attributes
+	 *  It looks for below attributes
+	 *  GenMsgCycleTime
+	 */
+	void tryFindMsgCycle(void);
 	void updateLastSentDataLabel(void);
 	void addSignal(
 		const std::string &nameRef,
@@ -113,6 +119,7 @@ private:
 	uint32_t getCrcStartBit(void);
 	uint64_t getSignalValue(QString signalStr);
 	void configProtection(void);
+	uint32_t getStartBit(QString signalName);
 };
 
 #endif // E2EPROTECTTXMSG_H

@@ -94,7 +94,7 @@ void E2EProtectSend::addToE2E(QString msgName)
 	ui->mainHorizontalLayout->addWidget(txMsgPtr);
 	txMsgPtr->setVisible(false);
 
-	const dbcppp::IMessage &msg = netPtr->Messages_Get(e2eTxMsgMap[msgName]->getMsgIdx());
+	const dbcppp::IMessage &msg = netPtr->Messages_Get(msgIdx);
 
 	for(int i = 0; i < msg.AttributeValues_Size(); ++i) {
 		const dbcppp::IAttribute& attr = msg.AttributeValues_Get(i);

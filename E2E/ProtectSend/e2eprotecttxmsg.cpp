@@ -47,14 +47,7 @@ E2EProtectTxMsg::E2EProtectTxMsg(
 
 	updateLastSentDataLabel();
 
-	for(int i = 0; i < msgRef.AttributeValues_Size(); ++i) {
-		const dbcppp::IAttribute& attr = msgRef.AttributeValues_Get(i);
-		dbcppp::IAttribute::value_t value = attr.Value();
-		if(attr.Name() != "GenMsgCycleTime") {
-			continue;
-		}
-		cycleTime = std::get<double>(value);
-	}
+	tryFindMsgCycle();
 
 	ui->idLabel->setText("0x" + QString::number(id, 16).toUpper());
 	ui->cycleTimeLabel->setText(QString::number(cycleTime));
@@ -83,6 +76,19 @@ E2EProtectTxMsg::~E2EProtectTxMsg()
 	delete ui;
 	for(int i = 0; i < sigsPtrVec.size(); ++i) {
 		delete sigsPtrVec[i];
+	}
+}
+
+void E2EProtectTxMsg::tryFindMsgCycle(void)
+{
+	const dbcppp::IMessage &msgRef = netPtr->Messages_Get(msgIdx);
+	for(int i = 0; i < msgRef.AttributeValues_Size(); ++i) {
+		const dbcppp::IAttribute& attr = msgRef.AttributeValues_Get(i);
+		dbcppp::IAttribute::value_t value = attr.Value();
+		if(attr.Name() != "GenMsgCycleTime") {
+			continue;
+		}
+		cycleTime = std::get<double>(value);
 	}
 }
 
@@ -336,27 +342,26 @@ void E2EProtectTxMsg::runSM(void)
 uint32_t E2EProtectTxMsg::getCounterStartBit(void)
 {
 	QString countSigName = ui->countComboBox->currentText();
-	for (int i = 0; i < sigsPtrVec.size(); ++i) {
-		E2EProtectTxSig *sigPtr = sigsPtrVec[i];
-		if (sigPtr->name.text() == countSigName) {
-			return sigPtr->startBit.text().toInt();
-		}
-	}
-	return 0;
+	return getStartBit(countSigName);
 }
 
 uint32_t E2EProtectTxMsg::getCrcStartBit(void)
 {
 	QString crcSigName = ui->crcComboBox->currentText();
-	for (int i = 0; i < sigsPtrVec.size(); ++i) {
-		E2EProtectTxSig *sigPtr = sigsPtrVec[i];
-		if (sigPtr->name.text() == crcSigName) {
-			return sigPtr->startBit.text().toInt();
+	return getStartBit(crcSigName);
+}
+
+uint32_t E2EProtectTxMsg::getStartBit(QString signalName)
+{
+	const dbcppp::IMessage &msgRef = netPtr->Messages_Get(msgIdx);
+	for(const dbcppp::ISignal &signal : msgRef.Signals()) {
+		QString sigName = QString::fromStdString(signal.Name());
+		if(sigName == signalName) {
+			return signal.StartBit();
 		}
 	}
 	return 0;
 }
-
 
 void E2EProtectTxMsg::on_protectionComboBox_currentTextChanged(const QString &arg1)
 {
