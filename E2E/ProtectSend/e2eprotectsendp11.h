@@ -1,3 +1,9 @@
+/**
+ * @file e2eprotectsendp11.h
+ * @brief This file defines the E2EProtectSendP11 class, which is used
+ *        for managing the E2E P11 protection configuration gui elements.
+ * @details The E2EProtectSendP11 class provides methods to set and get P11 related configurations,
+ */
 #ifndef E2EPROTECTSENDP11_H
 #define E2EPROTECTSENDP11_H
 
@@ -23,6 +29,11 @@ public:
 	uint16_t getDataId(void) const;
 	void setDataId(uint16_t id);
 	void setDataIdMode(DataIdMode mode);
+	/**
+	 * @brief Enable or disable the P11 related GUI elements.
+	 *        When messages are being sent, the GUI elements should be disabled.
+	 * @param isDisabled If true, the GUI elements will be disabled.
+	 */
 	void setDisabled(bool isDisabled);
 
 private:
