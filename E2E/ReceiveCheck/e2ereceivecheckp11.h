@@ -32,8 +32,15 @@ public:
 	uint32_t getMaxDeltaCounter(void) const;
 	void setDataId(uint16_t id);
 	void setDataIdMode(DataIdMode mode);
-
+signals:
+	void configChanged(void);
 private slots:
+
+	void on_dataIdSpinBox_valueChanged(int arg1);
+
+	void on_dataIdModeComboBox_currentTextChanged(const QString &arg1);
+
+	void on_maxDeltaSpinBox_valueChanged(int arg1);
 
 private:
 	Ui::E2EReceiveCheckP11 *ui;

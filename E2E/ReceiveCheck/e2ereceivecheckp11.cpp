@@ -47,3 +47,24 @@ void E2EReceiveCheckP11::setDataIdMode(DataIdMode mode)
 	ui->dataIdModeComboBox->setCurrentIndex(static_cast<int>(mode));
 }
 
+
+void E2EReceiveCheckP11::on_dataIdSpinBox_valueChanged(int arg1)
+{
+	(void)arg1;
+	emit configChanged();
+}
+
+
+void E2EReceiveCheckP11::on_dataIdModeComboBox_currentTextChanged(const QString &arg1)
+{
+	(void)arg1;
+	emit configChanged();
+}
+
+
+void E2EReceiveCheckP11::on_maxDeltaSpinBox_valueChanged(int arg1)
+{
+	(void)arg1;
+	emit configChanged();
+}
+

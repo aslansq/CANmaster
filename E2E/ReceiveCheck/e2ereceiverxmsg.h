@@ -52,6 +52,8 @@ private slots:
 
 	void on_protectionComboBox_currentTextChanged(const QString &arg1);
 
+	void onP11ConfigChanged(void);
+
 private:
 	Ui::E2EReceiveRxMsg *ui;
 	/// @brief Pointer to the DBC network interface

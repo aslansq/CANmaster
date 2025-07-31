@@ -69,6 +69,13 @@ E2EReceiveRxMsg::E2EReceiveRxMsg(
 
 	tryFindCrcAndCounter();
 	tryFindE2ECfg();
+
+	connect(
+		&p11Widget,
+		&E2EReceiveCheckP11::configChanged,
+		this,
+		&E2EReceiveRxMsg::onP11ConfigChanged
+	);
 }
 
 E2EReceiveRxMsg::~E2EReceiveRxMsg()
@@ -223,11 +230,16 @@ void E2EReceiveRxMsg::on_countComboBox_currentTextChanged(const QString &arg1)
 
 void E2EReceiveRxMsg::on_protectionComboBox_currentTextChanged(const QString &arg1)
 {
-	configProtection();
 	if(arg1 == "P11") {
 		p11Widget.setVisible(true);
 	} else {
 		p11Widget.setVisible(false);
 	}
+	configProtection();
+}
+
+void E2EReceiveRxMsg::onP11ConfigChanged(void)
+{
+	configProtection();
 }
 
