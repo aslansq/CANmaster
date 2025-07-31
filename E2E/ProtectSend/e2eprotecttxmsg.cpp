@@ -1,21 +1,21 @@
 #include "e2eprotecttxmsg.h"
 #include "ui_e2eprotecttxmsg.h"
 
+// needed for empty placeholder creation
 E2EProtectTxMsg::E2EProtectTxMsg() :
 	ui(new Ui::E2EProtectTxMsg)
 	, nameTableItem("")
-	, statusTableItem("x")
-	, isSending(false)
+	, statusTableItem("!")
 	, msgIdx(-1)
 	, cycleTime(-1.0)
 	, timer(TIMER_IDLE)
-	, protectProfileStr("NONE")
 {
 	ui->setupUi(this);
 	this->netPtr = nullptr;
 	id = 0;
 }
 
+// normally this constructor should be used
 E2EProtectTxMsg::E2EProtectTxMsg(
 		std::shared_ptr<dbcppp::INetwork> netPtr,
 		QString name,
@@ -24,19 +24,19 @@ E2EProtectTxMsg::E2EProtectTxMsg(
 	ui(new Ui::E2EProtectTxMsg)
 	, nameTableItem(name)
 	, statusTableItem("!")
-	, isSending(false)
 	, msgIdx(msgIdx)
 	, cycleTime(-1.0)
 	, dlc(-1)
-	, timer(TIMER_IDLE)
-	, protectProfileStr("NONE")
+	, timer(TIMER_IDLE) // Initialize timer to idle state
 {
 	ui->setupUi(this);
 	this->netPtr = netPtr;
 	ui->nameLabel->setText(name);
 
+	// Get a reference to the message in the DBC network
 	const dbcppp::IMessage &msgRef = netPtr->Messages_Get(msgIdx);
 
+	// Initialize CAN message properties
 	id = msgRef.Id();
 	dlc = msgRef.MessageSize();
 	canMsg.id = id;
@@ -53,9 +53,12 @@ E2EProtectTxMsg::E2EProtectTxMsg(
 	ui->cycleTimeLabel->setText(QString::number(cycleTime));
 	ui->dlcLabel->setText(QString::number(dlc));
 
+	// Add protection widgets to the layout but keep it hidden initially
+	// for them to visible, they needed to be selected from protectionComboBox
 	ui->protectionConfigVerticalLayout->addWidget(&p11Widget);
 	p11Widget.setVisible(false);
 
+	// Add signals to the signal table and combo boxes
 	for(const dbcppp::ISignal &signal : msgRef.Signals()) {
 		QString sigName = QString::fromStdString(signal.Name());
 		ui->crcComboBox->addItem(sigName);
@@ -81,6 +84,8 @@ E2EProtectTxMsg::~E2EProtectTxMsg()
 
 void E2EProtectTxMsg::tryFindMsgCycle(void)
 {
+	// Find the message cycle time
+	// by looking for the "GenMsgCycleTime" attribute in the message
 	const dbcppp::IMessage &msgRef = netPtr->Messages_Get(msgIdx);
 	for(int i = 0; i < msgRef.AttributeValues_Size(); ++i) {
 		const dbcppp::IAttribute& attr = msgRef.AttributeValues_Get(i);
@@ -92,6 +97,7 @@ void E2EProtectTxMsg::tryFindMsgCycle(void)
 	}
 }
 
+// try to find E2E configuration from message's attributes
 void E2EProtectTxMsg::tryFindE2ECfg(void)
 {
 	const dbcppp::IMessage &msgRef = netPtr->Messages_Get(msgIdx);
@@ -121,6 +127,7 @@ void E2EProtectTxMsg::tryFindE2ECfg(void)
 	}
 }
 
+// try to find CRC and counter signal from message's signal's name
 void E2EProtectTxMsg::tryFindCrcAndCounter(void)
 {
 	for (int i = 0; i < ui->crcComboBox->count(); ++i) {
@@ -152,6 +159,7 @@ void E2EProtectTxMsg::addSignal(
 		uint64_t len
 )
 {
+	// add new row to the signal table
 	int r = ui->sigTableWidget->rowCount();
 	ui->sigTableWidget->insertRow(r);
 
@@ -164,6 +172,7 @@ void E2EProtectTxMsg::addSignal(
 
 	sigsPtrVec.append(txSigPtr);
 
+	// add the signal table items to the signal table
 	ui->sigTableWidget->setItem(
 		r,
 		txSigPtr->sigNameIdx,
@@ -204,14 +213,19 @@ void E2EProtectTxMsg::updateLastSentDataLabel(void)
 	ui->lastSentDataLabel->setText(dataStr);
 }
 
+// Create the CAN message based on the current signal values
+// and protection settings
 void E2EProtectTxMsg::createCanMsg(void)
 {
+	// Reset the CAN message
 	canMsg.id = id;
 	canMsg.isExtd = (id > 0x7FF);
 	canMsg.dataLength = dlc;
 	memset(canMsg.data, 0, sizeof(canMsg.data));
 	canMsg.timestamp = 0;
 
+	// reads the signal values from the signal table
+	// and sets them to the CAN message data
 	for (int i = 0; i < sigsPtrVec.size(); ++i) {
 		E2EProtectTxSig *sigPtr = sigsPtrVec[i];
 		uint8_t startBit = sigPtr->startBit.text().toInt();
@@ -227,6 +241,7 @@ void E2EProtectTxMsg::createCanMsg(void)
 		}
 	}
 
+	// protect the message with P11 if choosen
 	if(
 		(ui->protectionComboBox->currentText() == "P11") &&
 		(p11Ptr != nullptr)
@@ -259,16 +274,20 @@ void E2EProtectTxMsg::on_sendPushButton_clicked()
 {
 	qDebug() << "E2EProtectTxMsg send push button clicked";
 	bool isChecked = ui->sendPushButton->isChecked();
-
+	// if actively sending data, disable every configuration
 	ui->cyclicCheckBox->setDisabled(isChecked);
 	ui->protectionComboBox->setDisabled(isChecked);
 	ui->crcComboBox->setDisabled(isChecked);
 	ui->countComboBox->setDisabled(isChecked);
-	p11Widget.setDisabled(isChecked);
 
+	if(ui->protectionComboBox->currentText() == "P11") {
+		p11Widget.setDisabled(isChecked);
+	}
+	// generate request
 	isThereReq = true;
 }
 
+// get value of the signal from signal table
 uint64_t E2EProtectTxMsg::getSignalValue(QString signalStr)
 {
 	uint64_t ret = 0;
@@ -282,9 +301,12 @@ uint64_t E2EProtectTxMsg::getSignalValue(QString signalStr)
 	return ret;
 }
 
+// configure protection
 void E2EProtectTxMsg::configProtection(void)
 {
 	if(ui->protectionComboBox->currentText() == "P11") {
+		p11Ptr.reset();
+		p11ConfigPtr.reset();
 		p11ConfigPtr = std::make_unique<E2E::P11Config>();
 		p11ConfigPtr->dataId = p11Widget.getDataId();
 		p11ConfigPtr->dataLen = dlc * 8;
@@ -307,18 +329,21 @@ void E2EProtectTxMsg::configProtection(void)
 	}
 }
 
+// run state machine
+// it does not really have explicity have states
+// but you can think of
+// timer downcounting = WAITING CYCLE TIME TO ELAPSE
+// timer idle = IDLE STATE
+// timer 0 = SEND
 void E2EProtectTxMsg::runSM(void)
 {
-	if(isThereReq) {
+	if(isThereReq) { // if there is req, elapse the timer right away
 		timer = 0;
 		isThereReq = false;
-		p11Ptr.reset();
-		p11ConfigPtr.reset();
-
 		configProtection();
 	}
 
-	if(timer == 0) {
+	if(timer == 0) { // timer elapsed so send
 		createCanMsg();
 		emit sendCanMsg(canMsg);
 		if(isCyclicSend()) {
@@ -365,7 +390,6 @@ uint32_t E2EProtectTxMsg::getStartBit(QString signalName)
 
 void E2EProtectTxMsg::on_protectionComboBox_currentTextChanged(const QString &arg1)
 {
-	protectProfileStr = arg1;
 	p11Widget.setVisible(false);
 
 	if(arg1 == "P11") {

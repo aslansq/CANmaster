@@ -1,3 +1,11 @@
+/**
+ * @file e2ereceivecheckp11.h
+ * @brief This file defines the E2EReceiveCheckP11 class, which is used
+ *        for managing the E2E P11 receive check configuration gui elements.
+ * @details The E2EReceiveCheckP11 class provides methods to set and get P11 related configurations,
+ *          such as Data ID mode and maximum delta counter.
+ */
+
 #ifndef E2ERECEIVECHECKP11_H
 #define E2ERECEIVECHECKP11_H
 

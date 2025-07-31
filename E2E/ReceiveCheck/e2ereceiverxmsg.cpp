@@ -1,6 +1,7 @@
 #include "e2ereceiverxmsg.h"
 #include "ui_e2ereceiverxmsg.h"
 
+// needed to make placeholder
 E2EReceiveRxMsg::E2EReceiveRxMsg(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::E2EReceiveRxMsg)
@@ -13,6 +14,7 @@ E2EReceiveRxMsg::E2EReceiveRxMsg(QWidget *parent)
 	ui->setupUi(this);
 }
 
+// Constructor that initializes the message with a network pointer, name, and message index
 E2EReceiveRxMsg::E2EReceiveRxMsg(
 	std::shared_ptr<dbcppp::INetwork> netPtr,
 	QString name,
