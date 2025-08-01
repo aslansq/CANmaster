@@ -59,6 +59,12 @@ QString CanStdForm::getInterface(void)
 	return "PEAK";
 }
 
+void CanStdForm::setDisabled(bool disabled)
+{
+	ui->baudComboBox->setDisabled(disabled);
+	ui->channelComboBox->setDisabled(disabled);
+}
+
 void CanStdForm::on_channelComboBox_currentTextChanged(const QString &arg1)
 {
 	channel = arg1;

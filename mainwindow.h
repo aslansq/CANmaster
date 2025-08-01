@@ -6,11 +6,15 @@
 #include <QTreeWidgetItem>
 #include <QVector>
 #include <QPointer>
+#include <dbcppp/Network.h>
+
 #include "canstdform.h"
+#include "can.h"
+
 #include "e2eprotectsend.h"
 #include "e2ereceivecheck.h"
-#include "can.h"
-#include <dbcppp/Network.h>
+
+#include "udsflasher.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,7 +35,8 @@ private slots:
 
 	void e2eProtectSendClosed(E2EProtectSend *ptr);
 	void e2eReceiveCheckClosed(E2EReceiveCheck *ptr);
-	void e2eProtectSendCanMsg(CanMsg canMsg);
+	void onSendCanMsg(const CanMsg &canMsg);
+	void udsFlasherClosed(UdsFlasher *ptr);
 
 	void on_connectPushButton_clicked(bool checked);
 
@@ -52,6 +57,7 @@ private:
 	CanStdForm *canStdFormPtr;
 	QVector<E2EProtectSend *> e2eProtectSendPtrVect;
 	QVector<E2EReceiveCheck *> e2eReceiveCheckPtrVect;
+	QVector<UdsFlasher *> udsFlasherPtrVect;
 	std::shared_ptr<dbcppp::INetwork> netPtr;
 	std::shared_ptr<Can> canPtr;
 
@@ -60,5 +66,6 @@ private:
 	void canStdConnect(void);
 	void createE2EProtectSend(void);
 	void createE2EReceiveCheck(void);
+	void createUdsFlasher(void);
 };
 #endif // MAINWINDOW_H

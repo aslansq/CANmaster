@@ -24,9 +24,32 @@ public:
 		return queue.dequeue();
 	}
 
+	bool waitAndDequeue(T &value, int timeoutMs) {
+		mutex.lock();
+		QElapsedTimer timer;
+		timer.start();
+		while(queue.isEmpty()) {
+			if (timer.elapsed() > timeoutMs) {
+				mutex.unlock();
+				return false; // Timeout
+			}
+			mutex.unlock();
+			QThread::msleep(1); // Sleep to avoid busy waiting
+			mutex.lock();
+		}
+		value = queue.dequeue();
+		mutex.unlock();
+		return true;
+	}
+
 	bool isEmpty() const {
 		QMutexLocker locker(&mutex);
 		return queue.isEmpty();
+	}
+
+	void clear() {
+		QMutexLocker locker(&mutex);
+		queue.clear();
 	}
 
 private:

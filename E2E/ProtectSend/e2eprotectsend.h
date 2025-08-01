@@ -42,7 +42,7 @@ signals:
 	 * @brief Signal emitted when a CAN message is sent.
 	 * @param canMsg The CAN message that was sent.
 	 */
-	void sendCanMsg(CanMsg canMsg);
+	void sendCanMsg(const CanMsg &canMsg);
 
 private slots:
 	/**
