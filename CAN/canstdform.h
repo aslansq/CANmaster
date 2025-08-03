@@ -19,6 +19,7 @@ public:
 	uint64_t getBaud(void) const;
 	int getChannel(void) const;
 	QString getInterface(void);
+	void setDisabled(bool disabled);
 
 private slots:
 	void on_channelComboBox_currentTextChanged(const QString &arg1);

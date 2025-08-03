@@ -26,7 +26,6 @@ void Can::startRxThread(void)
 	this->rxThread = QThread::create([this]() {
 		while(isConnected()) {
 			rx();
-			QThread::msleep(1);
 		}
 	});
 	this->rxThread->start();
@@ -45,7 +44,6 @@ void Can::startTxThread(void)
 	this->txThread = QThread::create([this]() {
 		while(isConnected()) {
 			tx();
-			QThread::msleep(1);
 		}
 	});
 	this->txThread->start();

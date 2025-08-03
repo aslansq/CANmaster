@@ -71,7 +71,7 @@ void MainWindow::createE2EProtectSend(void)
 			e2eProtectSendPtr,
 			&E2EProtectSend::sendCanMsg,
 			this,
-			&MainWindow::e2eProtectSendCanMsg
+			&MainWindow::onSendCanMsg
 		);
 		e2eProtectSendPtr->setVisible(true);
 		qDebug() << "Opened E2E_Protect_Send";
@@ -108,14 +108,43 @@ void MainWindow::createE2EReceiveCheck(void)
 	}
 }
 
+void MainWindow::createUdsFlasher(void)
+{
+	auto udsFlasherPtr = new UdsFlasher(this);
+	connect(
+		udsFlasherPtr,
+		&UdsFlasher::closed,
+		this,
+		&MainWindow::udsFlasherClosed
+	);
+	connect(
+		this,
+		&MainWindow::canMsgReceived,
+		udsFlasherPtr,
+		&UdsFlasher::onCanMsgReceived
+	);
+	connect(
+		udsFlasherPtr,
+		&UdsFlasher::sendCanMsg,
+		this,
+		&MainWindow::onSendCanMsg
+	);
+	udsFlasherPtr->setVisible(true);
+	qDebug() << "Opened UDS_Flasher";
+	udsFlasherPtrVect.append(udsFlasherPtr);
+}
+
 void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-	qDebug() << item->text(column) << " feature triggered";
+	QString featureName = item->text(column);
+	qDebug() << featureName << " feature triggered";
 
-	if(item->text(column) == "E2E_Protect_Send") {
+	if(featureName == "E2E_Protect_Send") {
 		createE2EProtectSend();
-	} else if(item->text(column) == "E2E_Receive_Check") {
+	} else if(featureName == "E2E_Receive_Check") {
 		createE2EReceiveCheck();
+	} else if(featureName == "UDS_Flasher") {
+		createUdsFlasher();
 	} else {
 		qDebug() << "Unknown feature";
 	}
@@ -187,7 +216,13 @@ void MainWindow::e2eReceiveCheckClosed(E2EReceiveCheck *ptr)
 	delete ptr;
 }
 
-void MainWindow::e2eProtectSendCanMsg(CanMsg canMsg)
+void MainWindow::udsFlasherClosed(UdsFlasher *ptr)
+{
+	udsFlasherPtrVect.removeOne(ptr);
+	delete ptr;
+}
+
+void MainWindow::onSendCanMsg(const CanMsg &canMsg)
 {
 	if(canPtr == nullptr) {
 		qDebug() << "CAN interface not connected, cannot send message";
@@ -272,16 +307,13 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
 			canPtr.reset();
 		}
 	}
+
+	canStdFormPtr->setDisabled(checked);
 }
 
 void MainWindow::onCanEventOccured(CanEvent event)
 {
 	if(event == CanEvent::MessageReceived) {
-		if(canPtr == nullptr) {
-			qDebug() << "CAN interface not connected, cannot receive message";
-			return;
-		}
-
 		CanMsg canMsg;
 		try {
 			canMsg = canPtr->rxQueue.dequeue();

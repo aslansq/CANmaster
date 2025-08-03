@@ -17,12 +17,15 @@ SOURCES += \
     E2E/ReceiveCheck/e2ereceivecheck.cpp \
     E2E/ReceiveCheck/e2ereceivecheckp11.cpp \
     E2E/ReceiveCheck/e2ereceiverxmsg.cpp \
+    UDS/Flasher/udsflashworker.cpp \
     main.cpp \
     mainwindow.cpp \
     PEAK/peakbasiccan.cpp \
     PEAK/peakstdcan.cpp \
     AutosarE2E/crc.cpp \
-    AutosarE2E/e2e.cpp
+    AutosarE2E/e2e.cpp \
+    UDS/Flasher/udsflasher.cpp \
+    ISOTP/isotp.cpp
 
 HEADERS += \
     CAN/can.h \
@@ -33,11 +36,17 @@ HEADERS += \
     E2E/ReceiveCheck/e2ereceivecheck.h \
     E2E/ReceiveCheck/e2ereceivecheckp11.h \
     E2E/ReceiveCheck/e2ereceiverxmsg.h \
+    UDS/Flasher/udsflashworker.h \
     mainwindow.h \
     PEAK/peakbasiccan.h \
     PEAK/peakstdcan.h \
     AutosarE2E/crc.hpp \
-    AutosarE2E/e2e.hpp
+    AutosarE2E/e2e.hpp \
+    UDS/Flasher/udsflasher.h \
+    UDS/SeednKey/linux/seednkey.h \
+    ISOTP/isotp_config.hpp \
+    ISOTP/isotp_defines.hpp \
+    ISOTP/isotp.hpp
 
 FORMS += \
     CAN/canstdform.ui \
@@ -47,7 +56,8 @@ FORMS += \
     E2E/ReceiveCheck/e2ereceivecheck.ui \
     E2E/ReceiveCheck/e2ereceivecheckp11.ui \
     E2E/ReceiveCheck/e2ereceiverxmsg.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    UDS/Flasher/udsflasher.ui
 
 INCLUDEPATH += /usr/local/include
 INCLUDEPATH += AutosarE2E/
@@ -55,7 +65,10 @@ INCLUDEPATH += CAN/
 INCLUDEPATH += E2E/ProtectSend
 INCLUDEPATH += E2E/ReceiveCheck
 INCLUDEPATH += PEAK/
-LIBS += -L/usr/local/lib -ldbcppp
+INCLUDEPATH += UDS/Flasher/
+INCLUDEPATH += UDS/SeednKey/linux/
+INCLUDEPATH += ISOTP/
+LIBS += -L/usr/local/lib -ldbcppp -ldl
 LIBS += -lpcanbasic
 
 # Default rules for deployment.
